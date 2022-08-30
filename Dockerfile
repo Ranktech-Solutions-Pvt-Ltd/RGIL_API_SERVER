@@ -7,5 +7,6 @@ EXPOSE 8080
 # ENV spring_profiles_active=prod
 ENV TZ='Asia/Kolkata'
 ENV JAVA_ENV=prod
+ENV SERVER_SERVLET_CONTEXT_PATH=/rgil
 
 ENTRYPOINT ["java","-jar","/rgil-api.jar","--spring.profiles.active=prod"]
