@@ -4,6 +4,9 @@
 package com.rank.rgil.rest.service.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -23,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rank.rgil.entities.CallDtl;
@@ -52,7 +56,6 @@ import com.rank.rgil.service.EmployeeTypeMstService;
 import com.rank.rgil.service.ModuleMstService;
 import com.rank.rgil.service.ReasonMstService;
 import com.rank.rgil.service.TenancyEmployeeMapService;
-import com.rank.rgil.util.Constants;
 import com.rank.rgil.util.CustomConvert;
 import com.rank.rgil.util.ThreadSafeSimpleDateFormat;
 import com.rank.rgil.vidyo.util.VidyoAccessAdmin;
@@ -71,6 +74,24 @@ import java.util.logging.Level;
 public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService {
 
     private static final Logger logger = LogManager.getLogger(CCMSRESTControllerService.class);
+
+    @Value("${SZ_API_BASE_URL}")
+    public String SZ_API_BASE_URL;
+    @Value("${SZ_API_AUTH}")
+    public String SZ_API_AUTH;
+	@Value("${adminUserId}")
+    public String adminUserId;
+    @Value("${adminPwd}")
+    public String adminPwd;
+	@Value("${socketHostPublic}")
+    public String socketHostPublic;
+	@Value("${socketHostPrivate}")
+    public String socketHostPrivate;
+	@Value("${vidyoportalUserServiceWSDL}")
+    public String vidyoportalUserServiceWSDL;
+	@Value("${vidyoportalAdminServiceWSDL}")
+    public String vidyoportalAdminServiceWSDL;
+	
 
     //private final boolean FALSE_STATUS = false;
     private final String MSG_SUCCESS = "SUCCESS";
@@ -383,7 +404,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         agentLoginResponse.setLastName(employeeMst.getLastName());
                         agentLoginResponse.setLoginId(employeeMst.getLoginId());
                         agentLoginResponse.setEmpType(employeeMst.getEmpTypId().getTypeName());
-                        agentLoginResponse.setSocketHostPublic(Constants.socketHostPublic);
+                        agentLoginResponse.setSocketHostPublic(socketHostPublic);
                         /**
                          * return from the method, if success
                          */
@@ -421,7 +442,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         agentLoginResponse.setLastName(employeeMst.getLastName());
                         agentLoginResponse.setLoginId(employeeMst.getLoginId());
                         agentLoginResponse.setEmpType(employeeMst.getEmpTypId().getTypeName());
-                        agentLoginResponse.setSocketHostPublic(Constants.socketHostPublic);
+                        agentLoginResponse.setSocketHostPublic(socketHostPublic);
                         /**
                          * return from the method, if success
                          */
@@ -451,13 +472,23 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
         }
     }
 
-    
+    private String encodeValue(String value) {
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     public Boolean userCheck(String uId) {
 
         Boolean exists = false;
         HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(Constants.socketHostPrivate + "/checkUser/" + uId);
+        String userId=encodeValue(uId);
+        logger.info("Value after encoding is==="+userId);
+        HttpGet httpget = new HttpGet(socketHostPrivate + "/checkUser/" + userId);
 
         HttpResponse response1;
         String response = "Failure";
@@ -483,9 +514,9 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
         AgentLoginResponse alr = new AgentLoginResponse();
         alr.setSuccMsg("Failure");
         try {
-            VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(Constants.vidyoportalUserServiceWSDL);
+            VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(vidyoportalUserServiceWSDL);
             MyAccountResponse myAccountResponse = vidyoAccessUser.getMyaccount("rgiladmin", "Rgil@1234$",
-                    Constants.vidyoportalUserServiceWSDL);
+                    vidyoportalUserServiceWSDL);
             String ownerid = "";
 
             if (myAccountResponse != null) {
@@ -498,7 +529,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
             if (!"".equals(ownerid.trim())) {
                 try {
                     List<Entity> entities = vidyoAccessUser.getAllRoomsByOwnerId("rgiladmin", "Rgil@1234$",
-                            Constants.vidyoportalUserServiceWSDL, ownerid);
+                            vidyoportalUserServiceWSDL, ownerid);
                     int count = 0;
                     for (Entity entitie : entities) {
                         if (!entitie.getEntityID().equals(ownerid)) {
@@ -507,9 +538,9 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                 logger.info("Delete----------------------------");
                                 count++;
                                 VidyoAccessUser vidyoAccessUser1 = new VidyoAccessUser(
-                                        Constants.vidyoportalUserServiceWSDL);
+                                        vidyoportalUserServiceWSDL);
                                 vidyoAccessUser1.deleteRoom("rgiladmin", "Rgil@1234$",
-                                        Constants.vidyoportalUserServiceWSDL, entitie.getEntityID());
+                                        vidyoportalUserServiceWSDL, entitie.getEntityID());
                                 // }
                             }
                         }
@@ -612,7 +643,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                 VidyoAccessAdmin accessAdmin = new VidyoAccessAdmin();
                                 if(entityId!=null){
                                     access=accessAdmin.getroom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
-                                    Constants.vidyoportalAdminServiceWSDL, entityId, empMst.getLoginId());
+                                    vidyoportalAdminServiceWSDL, entityId, empMst.getLoginId());
                                 }
                                 if(!access){
                                     /**
@@ -629,7 +660,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                      */
                                     VidyoAccessUser vidyoAccessUser = new VidyoAccessUser();
                                     String ret = vidyoAccessUser.createRoom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
-                                            Constants.vidyoportalUserServiceWSDL, empMst.getLoginId());
+                                            vidyoportalUserServiceWSDL, empMst.getLoginId());
 
                                     token = ret.split(",")[0].substring(ret.split(",")[0].lastIndexOf("/") + 1);
                                     entityId = ret.split(",")[1];
@@ -1012,9 +1043,9 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                 agentLoginResponse.setValidateMsg("");
                 // =======================Delete Room=============================
                 try {
-                    VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(Constants.vidyoportalUserServiceWSDL);
+                    VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(vidyoportalUserServiceWSDL);
                     MyAccountResponse myAccountResponse = vidyoAccessUser.getMyaccount(employeeMaster.getVidyoUserId(),
-                            employeeMaster.getVidyoPasswd(), Constants.vidyoportalUserServiceWSDL);
+                            employeeMaster.getVidyoPasswd(), vidyoportalUserServiceWSDL);
                     String ownerid = "";
 
                     if (myAccountResponse != null) {
@@ -1028,17 +1059,17 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         try {
                             List<Entity> entities = vidyoAccessUser.getAllRoomsByOwnerId(
                                     employeeMaster.getVidyoUserId(), employeeMaster.getVidyoPasswd(),
-                                    Constants.vidyoportalUserServiceWSDL, ownerid);
+                                    vidyoportalUserServiceWSDL, ownerid);
                             for (Entity entitie : entities) {
                                 if (!entitie.getEntityID().equals(ownerid)) {
                                     if (entitie.getRoomStatus().equalsIgnoreCase("Empty")) {
                                         if (entitie.getDisplayName().contains(employeeMaster.getLoginId())) {
                                             logger.info("delete----------------");
                                             VidyoAccessUser vidyoAccessUser1 = new VidyoAccessUser(
-                                                    Constants.vidyoportalUserServiceWSDL);
+                                                    vidyoportalUserServiceWSDL);
                                             vidyoAccessUser1.deleteRoom(employeeMaster.getVidyoUserId(),
                                                     employeeMaster.getVidyoPasswd(),
-                                                    Constants.vidyoportalUserServiceWSDL, entitie.getEntityID());
+                                                    vidyoportalUserServiceWSDL, entitie.getEntityID());
                                         }
                                     }
                                 }
@@ -1153,9 +1184,9 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
 
             // =======================Delete Room=============================
             try {
-                VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(Constants.vidyoportalUserServiceWSDL);
+                VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(vidyoportalUserServiceWSDL);
                 MyAccountResponse myAccountResponse = vidyoAccessUser.getMyaccount(empMst.getVidyoUserId(),
-                        empMst.getVidyoPasswd(), Constants.vidyoportalUserServiceWSDL);
+                        empMst.getVidyoPasswd(), vidyoportalUserServiceWSDL);
                 String ownerid = "";
 
                 if (myAccountResponse != null) {
@@ -1168,16 +1199,16 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                 if (!"".equals(ownerid.trim())) {
                     try {
                         List<Entity> entities = vidyoAccessUser.getAllRoomsByOwnerId(empMst.getVidyoUserId(),
-                                empMst.getVidyoPasswd(), Constants.vidyoportalUserServiceWSDL, ownerid);
+                                empMst.getVidyoPasswd(), vidyoportalUserServiceWSDL, ownerid);
                         for (Entity entitie : entities) {
                             if (!entitie.getEntityID().equals(ownerid)) {
                                 if (entitie.getRoomStatus().equalsIgnoreCase("Empty")) {
                                     if (entitie.getDisplayName().contains(empMst.getLoginId())) {
                                         logger.info("delete----------------");
                                         VidyoAccessUser vidyoAccessUser1 = new VidyoAccessUser(
-                                                Constants.vidyoportalUserServiceWSDL);
+                                                vidyoportalUserServiceWSDL);
                                         vidyoAccessUser1.deleteRoom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
-                                                Constants.vidyoportalUserServiceWSDL, entitie.getEntityID());
+                                                vidyoportalUserServiceWSDL, entitie.getEntityID());
                                     }
                                 }
                             }
@@ -1218,8 +1249,8 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
         
         HttpClient httpclient = new DefaultHttpClient();
         
-        HttpGet httpget = new HttpGet(Constants.SZ_API_BASE_URL + "/GetUsers");
-        httpget.addHeader("Authorization", Constants.SZ_API_AUTH);
+        HttpGet httpget = new HttpGet(SZ_API_BASE_URL + "/GetUsers");
+        httpget.addHeader("Authorization", SZ_API_AUTH);
 
         HttpResponse response1;
         String response = "Failure";
@@ -1261,8 +1292,8 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         em.setLoginId(uid);
                         em.setLoginPasswd("123");
                         em.setCellPhone(Long.parseLong(jsonObj.getString("MobileNo")));
-                        em.setVidyoUserId(Constants.adminUserId);
-                        em.setVidyoPasswd(Constants.adminPwd);
+                        em.setVidyoUserId(adminUserId);
+                        em.setVidyoPasswd(adminPwd);
                         em.setDeactivateFlg(false);
                         em.setModuleId(moduleMst);
                         em.setHomePhone(Long.parseLong("0"));
