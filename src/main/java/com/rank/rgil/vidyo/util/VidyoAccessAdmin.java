@@ -41,6 +41,7 @@ import org.apache.logging.log4j.Logger;
 public class VidyoAccessAdmin implements Serializable {
 
     private static final Logger logger = LogManager.getLogger(VidyoAccessAdmin.class);
+    
 
     VidyoPortalAdminService vidyoPortalAdminService;
     VidyoPortalAdminServicePortType vidyoPortalAdminServicePort;

@@ -1,6 +1,5 @@
 package com.rank.rgil.vidyo.util;
 
-import com.rank.rgil.util.Constants;
 import com.vidyo.portal.contentmanage.DeleteRecordRequest;
 import com.vidyo.portal.contentmanage.DeleteRecordResponse;
 import com.vidyo.portal.contentmanage.RecordsSearchRequest;
@@ -21,11 +20,16 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  *
  * @author vivekananda
  */
 public class VidyoAccessReplay implements Serializable {
+
+   	@Value("${vidyoportalReplayServiceWSDL}")
+    public String vidyoportalReplayServiceWSDL;
 
     VidyoReplayContentManagementService vidyoReplayContentManagementService;
     VidyoReplayContentManagementServicePortType vidyoReplayContentManagementServicePortType;
@@ -300,7 +304,7 @@ public class VidyoAccessReplay implements Serializable {
     }
 
     public RecordsSearchResponse searchRecordByRoomName(String userId, String password, String roomName) throws Exception {
-        String replayportalurl = Constants.vidyoportalReplayServiceWSDL;
+        String replayportalurl = vidyoportalReplayServiceWSDL;
 
         URL url = new URL(replayportalurl);
 

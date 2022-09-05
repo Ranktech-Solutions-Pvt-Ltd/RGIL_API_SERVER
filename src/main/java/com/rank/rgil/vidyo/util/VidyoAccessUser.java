@@ -1,6 +1,5 @@
 package com.rank.rgil.vidyo.util;
 
-import com.rank.rgil.util.Constants;
 import com.vidyo.portal.user.v1_1.ControlMeetingFault_Exception;
 import com.vidyo.portal.user.v1_1.CreateRoomRequest;
 import com.vidyo.portal.user.v1_1.CreateRoomResponse;
@@ -57,7 +56,16 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class VidyoAccessUser implements Serializable {
+
+	@Value("${portalExtention}")
+    public String portalExtention;
+	@Value("${vidyoportalUserServiceWSDL}")
+    public String vidyoportalUserServiceWSDL;
+	@Value("${recorderPrefix}")
+    public String recorderPrefix;
 
     VidyoPortalUserService vidyoUserService;
     VidyoPortalUserServicePortType vidyoPortalUserServicePort;
@@ -213,7 +221,7 @@ public class VidyoAccessUser implements Serializable {
 
         StartRecordingRequest startRecordingRequest = new StartRecordingRequest();
         startRecordingRequest.setConferenceID(entityID);
-        startRecordingRequest.setRecorderPrefix(Constants.recorderPrefix);
+        startRecordingRequest.setRecorderPrefix(recorderPrefix);
         startRecordingRequest.setWebcast(true);
 
         StartRecordingResponse recordingResponse = vidyoPortalUserServicePort.startRecording(startRecordingRequest);
@@ -532,8 +540,8 @@ public class VidyoAccessUser implements Serializable {
         Long number = (long) Math.floor(Math.random() * 9000000L) + 1000000L;
         createRoomRequest.setName(agentName.concat(number.toString()));
         String extension = "";
-        if (portalUrl.trim().equalsIgnoreCase(Constants.vidyoportalUserServiceWSDL.trim())) {
-            extension = Constants.portalExtention.concat(number.toString());
+        if (portalUrl.trim().equalsIgnoreCase(vidyoportalUserServiceWSDL.trim())) {
+            extension = portalExtention.concat(number.toString());
         }
 
         createRoomRequest.setExtension(extension);
