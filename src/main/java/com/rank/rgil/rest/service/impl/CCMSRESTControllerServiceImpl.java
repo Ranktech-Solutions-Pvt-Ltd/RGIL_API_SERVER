@@ -28,6 +28,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 
 import com.rank.rgil.entities.CallDtl;
 import com.rank.rgil.entities.CallMst;
@@ -473,20 +474,20 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
     }
 
     private String encodeValue(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return "";
+        return UriUtils.encodePath(value, "UTF-8");
+        //return "";
     }
 
-    public Boolean userCheck(String uId) {
+    private String encodePath(String path) {
+        path = UriUtils.encodePath(path, "UTF-8");
+        return path;
+    }
+
+    public Boolean userCheck(String uId) throws UnsupportedEncodingException  {
 
         Boolean exists = false;
         HttpClient httpclient = new DefaultHttpClient();
-        String userId=encodeValue(uId);
+        String userId=encodePath(uId);
         logger.info("Value after encoding is==="+userId);
         HttpGet httpget = new HttpGet(socketHostPrivate + "/checkUser/" + userId);
 
