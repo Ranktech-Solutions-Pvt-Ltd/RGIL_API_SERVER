@@ -1276,10 +1276,12 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                     }
                     //EmployeeMst creatorEm = employeeMstService.findByLoginId("admin").get(0);
                     if (em != null) {
+                        if((!em.getFirstName().equals(jsonObj.getString("FirstName"))) || (!em.getLastName().equals(jsonObj.getString("LastName"))) || (!em.getEmail().equals(jsonObj.getString("EmailID"))) || (!em.getCellPhone().equals(Long.parseLong(jsonObj.getString("MobileNo")))))
                         em.setFirstName(jsonObj.getString("FirstName"));
                         em.setLastName(jsonObj.getString("LastName"));
                         em.setEmail(jsonObj.getString("EmailID"));
                         em.setCellPhone(Long.parseLong(jsonObj.getString("MobileNo")));
+                        em.setUpdateTime(CustomConvert.javaDateToTimeStamp(new Date()));
                         employeeMstService.save(em);
                     } else { 
                         em = new EmployeeMst();
@@ -1301,6 +1303,8 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         em.setOfficePhone(Long.parseLong("0"));
                         em.setAddrsLine1("India");
                         em.setCountry("India");
+                        em.setCreateTime(CustomConvert.javaDateToTimeStamp(new Date()));
+                        em.setUpdateTime(CustomConvert.javaDateToTimeStamp(new Date()));
                         employeeMstService.save(em);
                     }
                 }
@@ -1309,6 +1313,9 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
             logger.error("Error===" + ex);
         } catch (JSONException ex) {
             java.util.logging.Logger.getLogger(CCMSRESTControllerServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            java.util.logging.Logger.getLogger(CCMSRESTControllerServiceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.rank.rgil.entities;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
@@ -46,7 +47,7 @@ public class EmployeeMst implements Serializable {
     private Integer pin;
     private String country;
     private String email;
-    private Long officePhone;
+    private Long officePhone; 
     private Long homePhone;
     private Long cellPhone;
     private String vidyoUserId;
@@ -59,6 +60,8 @@ public class EmployeeMst implements Serializable {
     private Collection<CallRecords> callRecordsCollection;
     private EmployeeTypeMst empTypId;
     private ModuleMst moduleId;
+    private Timestamp createTime;
+    private Timestamp updateTime;
     private Collection<EmployeeCallProficiency> employeeCallProficiencyCollection;
     private Collection<CallDtl> callDtlCollection;
     private Collection<ForwardedCall> forwardedCallCollection;
@@ -169,6 +172,24 @@ public class EmployeeMst implements Serializable {
 
     public void setAddrsLine1(String addrsLine1) {
         this.addrsLine1 = addrsLine1;
+    }
+
+    @Column(name = "create_time")
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    @Column(name = "update_time")
+    public Timestamp getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Timestamp updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Column(name = "addrs_line2")
