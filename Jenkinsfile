@@ -9,7 +9,7 @@ pipeline {
             }
             steps {
                 echo 'building the application'
-                sh 'mvn clean package -DSkipTests'
+                sh 'mvn clean package -DskipTests'
             }
 
             post{
