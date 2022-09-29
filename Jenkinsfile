@@ -5,7 +5,7 @@ pipeline {
     stages {
         stage("Build and create jar") {
             tools {
-                maven 'local_maven'
+                maven 'maven_3.2.5'
             }
             steps {
                 echo 'building the application'
