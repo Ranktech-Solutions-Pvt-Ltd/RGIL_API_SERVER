@@ -1241,11 +1241,12 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
 
     @Override
     public String getUsersFromRGIL() {//chayan
-        getuseronly();
-        return "OK";
+        String ret=getuseronly();
+        return ret;
     }
 
-    public void getuseronly() {
+    public String getuseronly() {
+        String flg="False";
         logger.info("Get User Started=====================");
         
         HttpClient httpclient = new DefaultHttpClient();
@@ -1308,6 +1309,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                         employeeMstService.save(em);
                     }
                 }
+                flg="True";
             }
         } catch (IOException ex) {
             logger.error("Error===" + ex);
@@ -1317,6 +1319,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
             // TODO Auto-generated catch block
             java.util.logging.Logger.getLogger(CCMSRESTControllerServiceImpl.class.getName()).log(Level.SEVERE, null, e);
         }
+        return flg;
     }
 
 }
