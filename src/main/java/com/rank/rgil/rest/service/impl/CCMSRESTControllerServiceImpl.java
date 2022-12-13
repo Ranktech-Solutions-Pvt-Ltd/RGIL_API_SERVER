@@ -92,6 +92,8 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
     public String vidyoportalUserServiceWSDL;
 	@Value("${vidyoportalAdminServiceWSDL}")
     public String vidyoportalAdminServiceWSDL;
+    @Value("${portalExtention}")
+    public String portalExtention;
 	
 
     //private final boolean FALSE_STATUS = false;
@@ -516,7 +518,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
         alr.setSuccMsg("Failure");
         try {
             VidyoAccessUser vidyoAccessUser = new VidyoAccessUser(vidyoportalUserServiceWSDL);
-            MyAccountResponse myAccountResponse = vidyoAccessUser.getMyaccount("rgiladmin", "Rgil@1234$",
+            MyAccountResponse myAccountResponse = vidyoAccessUser.getMyaccount(adminUserId, adminPwd,
                     vidyoportalUserServiceWSDL);
             String ownerid = "";
 
@@ -529,7 +531,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
 
             if (!"".equals(ownerid.trim())) {
                 try {
-                    List<Entity> entities = vidyoAccessUser.getAllRoomsByOwnerId("rgiladmin", "Rgil@1234$",
+                    List<Entity> entities = vidyoAccessUser.getAllRoomsByOwnerId(adminUserId, adminPwd,
                             vidyoportalUserServiceWSDL, ownerid);
                     int count = 0;
                     for (Entity entitie : entities) {
@@ -540,7 +542,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                 count++;
                                 VidyoAccessUser vidyoAccessUser1 = new VidyoAccessUser(
                                         vidyoportalUserServiceWSDL);
-                                vidyoAccessUser1.deleteRoom("rgiladmin", "Rgil@1234$",
+                                vidyoAccessUser1.deleteRoom(adminUserId, adminPwd,
                                         vidyoportalUserServiceWSDL, entitie.getEntityID());
                                 // }
                             }
@@ -667,7 +669,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                     VidyoAccessUser vidyoAccessUser = new VidyoAccessUser();
                                     logger.info("empMst.getVidyoUserId(), empMst.getVidyoPasswd(),empMst.getLoginId() "+empMst.getVidyoUserId()+","+ empMst.getVidyoPasswd()+","+empMst.getLoginId());
                                     String ret = vidyoAccessUser.createRoom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
-                                            vidyoportalUserServiceWSDL, empMst.getLoginId());
+                                            vidyoportalUserServiceWSDL, empMst.getLoginId(),portalExtention);
 
                                     token = ret.split(",")[0].substring(ret.split(",")[0].lastIndexOf("/") + 1);
                                     entityId = ret.split(",")[1];

@@ -516,13 +516,18 @@ public class VidyoAccessUser implements Serializable {
         }
     }
 
-    public String createRoom(String userId, String password, String portalUrl, String agentName) throws Exception {
+    public String createRoom(String userId, String password, String portalUrl, String agentName, String extension) throws Exception {
         String roomlink;
         String entityid;
         String ret;
-
+        
+        Logger.getLogger(VidyoAccessUser.class.getName()).info("userId: "+userId);
+        Logger.getLogger(VidyoAccessUser.class.getName()).info("password: "+password);
+        Logger.getLogger(VidyoAccessUser.class.getName()).info("portalUrl: "+portalUrl);
+        Logger.getLogger(VidyoAccessUser.class.getName()).info("agentName: "+agentName);
+        
         URL url = new URL(portalUrl);
-
+        
         QName qname = new QName("http://portal.vidyo.com/user/v1_1", "VidyoPortalUserService");
         Service service = Service.create(url, qname);
         vidyoPortalUserServicePort = service.getPort(VidyoPortalUserServicePortType.class);
@@ -530,20 +535,23 @@ public class VidyoAccessUser implements Serializable {
         if (portalUrl1.contains("?wsdl")) {
             portalUrl1 = portalUrl1.replaceAll("\\?wsdl", "");
         }
-
+        
         BindingProvider bp = (BindingProvider) vidyoPortalUserServicePort;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, portalUrl1);
         bp.getRequestContext().put(BindingProvider.USERNAME_PROPERTY, userId);
         bp.getRequestContext().put(BindingProvider.PASSWORD_PROPERTY, password);
-
+        
         CreateRoomRequest createRoomRequest = new CreateRoomRequest();
         Long number = (long) Math.floor(Math.random() * 9000000L) + 1000000L;
         createRoomRequest.setName(agentName.concat(number.toString()));
-        String extension = "";
-        if (portalUrl.trim().equalsIgnoreCase(vidyoportalUserServiceWSDL.trim())) {
+        // String extension = "";
+        
+        /* if (portalUrl.trim().equalsIgnoreCase(vidyoportalUserServiceWSDL.trim())) {
             extension = portalExtention.concat(number.toString());
-        }
-
+            
+        } */
+        
+        extension = extension.concat(number.toString());
         createRoomRequest.setExtension(extension);
 
         CreateRoomResponse createRoomResponse = vidyoPortalUserServicePort.createRoom(createRoomRequest);
