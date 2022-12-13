@@ -643,8 +643,13 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
 
                                 VidyoAccessAdmin accessAdmin = new VidyoAccessAdmin();
                                 if(entityId!=null){
+                                    try{
                                     access=accessAdmin.getroom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
                                     vidyoportalAdminServiceWSDL, entityId, empMst.getLoginId());
+                                    }catch(Exception e){
+                                        logger.info(e.getMessage());
+                                        access=false;
+                                    }
                                 }
                                 if(!access){
                                     /**
@@ -660,6 +665,7 @@ public class CCMSRESTControllerServiceImpl implements CCMSRESTControllerService 
                                      *          token as follows
                                      */
                                     VidyoAccessUser vidyoAccessUser = new VidyoAccessUser();
+                                    logger.info("empMst.getVidyoUserId(), empMst.getVidyoPasswd(),empMst.getLoginId() "+empMst.getVidyoUserId()+","+ empMst.getVidyoPasswd()+","+empMst.getLoginId());
                                     String ret = vidyoAccessUser.createRoom(empMst.getVidyoUserId(), empMst.getVidyoPasswd(),
                                             vidyoportalUserServiceWSDL, empMst.getLoginId());
 
